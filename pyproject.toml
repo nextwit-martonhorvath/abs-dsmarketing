@@ -4,4 +4,15 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "gensim>=4.4.0",
+    "ipykernel>=7.2.0",
+    "librecommender>=1.5.2",
+    "matplotlib>=3.10.8",
+    "pandas>=3.0.2",
+    "scikit-learn>=1.8.0",
+    "scipy>=1.17.1",
+    "tensorflow>=2.21.0",
+    "torch>=2.11.0",
+    "tqdm>=4.67.3",
+]
