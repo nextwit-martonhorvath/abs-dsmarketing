@@ -1,4 +1,5 @@
-# Notebook Fixes 
+# Notebook Fixes and Submission Status
+
 ## 1. Issues Identified
 
 ### 1.1 Train/Test Split Inconsistency
@@ -31,6 +32,18 @@ This is interaction-based item-item similarity, not metadata-based content filte
 ### 1.4 Missing Metadata Content Pipeline
 
 A full metadata-based content recommender (from `books.csv`) was not yet implemented in the earlier version.
+
+### 1.5 Missing Full-Data Retraining
+
+The notebook did not include a final section that retrains models on the complete unsplit dataset after evaluation.
+
+### 1.6 Missing Timing Comparison
+
+The notebook did not report calculation/training runtime comparison between the two official methods.
+
+### 1.7 Top-N Presentation Misalignment
+
+Some earlier outputs used top-10 while final assignment presentation requires top-5 recommendations.
 
 ---
 
@@ -92,9 +105,9 @@ Key constraints enforced:
 
 ### 2.6 Added Official Content Recommendation Output
 
-- Added top-N content recommendation output for:
+- Added top-5 content recommendation output for:
   - `user_id = 31933`
-  - `n = 10`
+  - `n = 5`
 
 ### 2.7 Added Content Evaluation Cell
 
@@ -114,12 +127,35 @@ Added explicit content-model evaluation on `df_test_ratio`:
   - `ItemCF (Collaborative Filtering)`
   - `Content-TFIDF (Metadata-Based)`
 - Metrics columns:
-  - `RMSE`, `Precision@10`, `Recall@10`, plus concise notes
+  - `RMSE`, `Precision@10`, `Recall@10`, `Calculation time`, plus concise notes
 - Added final presentation cell:
   - top-5 recommendations for `user_id = 31933` from both models
   - excludes seen training items
   - displays human-readable book metadata
 - Added final markdown conclusion section.
+
+### 2.9 Added Runtime Tracking
+
+- Added explicit runtime tracking using `time` for:
+  - ItemCF ratio-split training/evaluation path
+  - Content model feature-build + evaluation path
+- Updated final comparison table to include `Calculation time`.
+
+### 2.10 Added Additional Users (Team/Extra Users)
+
+- Added final top-5 outputs for users:
+  - `31933` (required)
+  - `100` and `200` (additional users)
+- Displayed for both official models with readable metadata fields.
+
+### 2.11 Added Full-Data Retraining Section
+
+- Added markdown note clarifying:
+  - split-based results are for evaluation
+  - full-data models are for final recommendation generation
+- Retrained ItemCF on full unsplit `df_named`.
+- Reused metadata-content pipeline with full ratings as the user-profile source.
+- Generated final top-5 recommendations for users `31933`, `100`, and `200` for both models.
 
 ---
 
@@ -136,18 +172,31 @@ Added explicit content-model evaluation on `df_test_ratio`:
 
 ## 4. Remaining Tasks
 
-- Re-run notebook top-to-bottom to refresh all outputs in final order.
-- Verify metric values are generated without stale intermediate objects.
-- (If assignment explicitly requires) add a clear full-dataset retraining step after evaluation for final deployment-style recommendations.
-- Final proofreading of markdown narrative and section titles.
+- Re-run notebook top-to-bottom to refresh outputs and execution order.
+- Verify all runtime and metric cells are executed in final sequence.
+- Final proofreading of markdown wording and section continuity.
 
 ---
 
-## 5. Final Goal
+## 5. Final Submission Checklist
+
+- [x] ItemCF kept as collaborative filtering baseline.
+- [x] `split_by_ratio` used as official split for final reported metrics.
+- [x] Training/prediction/ranking aligned to ratio-split objects.
+- [x] Mislabeled interaction-pivot block marked as exploratory appendix (non-official).
+- [x] True metadata-based TF-IDF content recommender implemented with scikit-learn.
+- [x] RMSE, Precision@10, Recall@10 produced on official evaluation split.
+- [x] Runtime comparison added.
+- [x] Top-5 recommendations shown for `user_id = 31933`.
+- [x] Top-5 recommendations shown for additional users (`100`, `200`).
+- [x] Full-dataset retraining section added after evaluation.
+- [x] Final model comparison table and concise academic conclusion added.
+
+## 6. Final Goal
 
 Produce a clean, reproducible notebook that:
 
 - compares two valid recommender approaches,
 - uses one consistent official evaluation split,
-- provides top-N recommendations for `user_id = 31933`,
+- provides top-5 recommendations for `user_id = 31933` and additional users,
 - and ends with a defensible model recommendation for the bookstore.
