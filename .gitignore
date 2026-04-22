@@ -39,3 +39,5 @@ Thumbs.db
 
 # Project specific
 .env
+notebook_fixes.md
+requirements.txt
