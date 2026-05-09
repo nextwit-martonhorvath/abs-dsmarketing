@@ -41,3 +41,5 @@ Thumbs.db
 .env
 notebook_fixes.md
 requirements.txt
+
+data/
