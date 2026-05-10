@@ -1,12 +1,4 @@
-Read [](file:///Users/martonhorvath/all_repos/abs-dsmarketing/data)
-
-Updated memory file [](file:///Users/martonhorvath/Library/Application%20Support/Code/User/workspaceStorage/bb4029242be636434a89c1834c21e59c/GitHub.copilot-chat/memory-tool/memories/ODA5YTA3NzItNDlhNy00YzcxLTgwYmMtYjg4MzM4MmIzZWVi/plan.md)
-
-Plan updated. Here's the revised version:
-
----
-
-## Plan: CTR Prediction Notebook (Updated)
+# Plan: CTR Prediction Notebook (Updated)
 
 **Decisions locked in:**
 - **New notebook** at `assignment2/notebook.ipynb` — existing `input/Assignment 2 - notebook.ipynb` left untouched
@@ -74,3 +66,78 @@ Plan updated. Here's the revised version:
 2. Both model loops complete in a single pass without memory errors
 3. Both models beat baseline log loss
 4. NB training time < SGD training time
+
+
+# Comparison with class materials
+
+Let me read the notebook more carefully alongside the lecture material. 
+
+Read [](file:///Users/martonhorvath/all_repos/abs-dsmarketing/assignment2/notebook.ipynb#1-1), lines 1 to 100
+
+Here's a structured compliance check against the lecture (Slides 1–55):
+
+---
+
+## Compliance Assessment
+
+### What aligns well
+
+| Aspect | Lecture (Slide) | Notebook |
+|--------|----------------|---------|
+| Problem framing | Binary classification, predict click *probability* (Slides 11–13) | Correctly framed |
+| `predict_proba()` | Slide 13 | Used correctly |
+| `SGDClassifier` + `partial_fit()` | Slide 24 | Used correctly |
+| `MultinomialNB` + `partial_fit()` | Slide 23 (online learning) | Used correctly |
+| Log loss formula $-[y\ln p + (1-y)\ln(1-p)]$ | Slide 19 | `incremental_log_loss()` implements this exactly |
+| Class imbalance discussion | Slides 14–18 | Covered in EDA and discussion prompts |
+| Temporal/sequential split logic | Slide 23 (observations come in continuously) | Temporal split with 80/20 |
+| Naïve Bayes = counting approach | Slides 27–33 | `MultinomialNB` does this |
+| Conditional independence assumption | Slide 29 | Mentioned in Section 7 discussion |
+| Laplace smoothing | Implied by Slide 33 (unseen values) | `alpha=1.0` in NB |
+
+---
+
+### Compliance gaps
+
+**1. Feature encoding: `FeatureHasher` vs `OneHotEncoder`**
+
+The lecture explicitly shows `OneHotEncoder` (Slides 36–37):
+```python
+from sklearn.preprocessing import OneHotEncoder
+encoder = OneHotEncoder()
+X_train_encoded = encoder.fit_transform(X_train)
+```
+The notebook uses `FeatureHasher`, which is more practical but **not covered in the lecture at all**. This is the biggest drift. If a grader looks for the course-taught encoding approach, this will stand out.
+
+**2. SGD hyperparameters are not anchored to the lecture**
+
+The lecture shows `SGDClassifier()` with no parameters (Slide 24). The notebook uses:
+```python
+SGDClassifier(loss="log_loss", penalty="l2", alpha=1e-4, learning_rate="optimal")
+```
+None of these choices are explained relative to course material. There's even a `# IMPROVE` comment in that cell acknowledging this. The lecture discusses the learning rate schedule $\eta_t = 1/\sqrt{t}$ (Slide 43) — `learning_rate="optimal"` uses sklearn's own formula, not the one taught.
+
+**3. `alternate_sign=False` detail for NB**
+
+This is a technical implementation detail needed because `MultinomialNB` requires non-negative inputs. It's not derivable from the lecture — it's a scikit-learn internals concern. Fine as a practical necessity, but it should be briefly explained as such, not presented as a course concept.
+
+**4. Mini-batch size of 50,000**
+
+Slide 50 introduces mini-batches conceptually, but the lecture gives no guidance on choosing a size. `CHUNK_SIZE = 50_000` is reasonable but unexplained.
+
+**5. `classes=[0, 1]` in `partial_fit()`**
+
+Not mentioned in the lecture's code snippet (Slide 24). It's required by sklearn on the first call, but a student unfamiliar with the API wouldn't know why it's there. Worth a one-line comment.
+
+---
+
+### Summary by risk level
+
+| Gap | Risk |
+|-----|------|
+| `FeatureHasher` instead of `OneHotEncoder` | High — lecture explicitly teaches OHE |
+| SGD parameters unexplained vs lecture | Medium — the `# IMPROVE` comment already flags this |
+| `alternate_sign=False` has no explanation | Low — practical necessity |
+| Learning rate `"optimal"` vs lecture's $1/\sqrt{t}$ | Medium — lecture teaches the formula; notebook silently uses a different one |
+
+The most defensible fix is to **add a brief note in Section 3** explaining why you deviate from `OneHotEncoder` (it can't handle unseen categories in online learning, and the dataset is too large to fit all unique values upfront), and to **tie the SGD parameter choices back to the lecture concepts** (log loss from Slide 42, learning rate from Slide 43).
